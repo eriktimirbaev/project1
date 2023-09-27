@@ -144,12 +144,38 @@ Station add_station() {
 	return s;
 }
 
+void data(Pipe p, Station s) {
+	if (p.name.empty())
+	{
+		cout << "Please add a pipe." << endl;
+	}
+	else
+	{
+		cout << "Pipe name: " << p.name
+			<< "\nPipe length: " << p.length
+			<< "\nPipe diameter: " << p.diameter
+			<< "\nRepair: " << p.repair << endl;
+	}
+	if (s.name.empty())
+	{
+		cout << "Please add a compressor station." << endl;
+	}
+	else
+	{
+		cout << "Station name: " << s.name
+			<< "\nWorkshops: " << s.workshops
+			<< "\nWorkshops in operation: " << s.workshops_in_operation
+			<< "\nEffectiveness: " << s.effectiveness << endl;
+	}
+}
+
 void menu() {
 	Pipe pipe;
 	Station station;
 	while (true)
 	{
-		cout << "1. Add a pipe" << endl
+		cout << "MENU" << endl
+			<< "1. Add a pipe" << endl
 			<< "2. Add a compressor station" << endl
 			<< "3. Viewing all objects" << endl
 			<< "4. Edit a pipe" << endl
@@ -177,7 +203,7 @@ void menu() {
 				station = add_station();
 				break;
 			case 3:
-				cout << "3";
+				data(pipe, station);
 				break;
 			case 4:
 				cout << "4";
