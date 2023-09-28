@@ -18,15 +18,19 @@ struct Station
 	double effectiveness;
 };
 
+void bufer() {
+	cin.clear();
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
 int get_length() {
 	while (true)
 	{
+		bufer();
 		int len;
 		cin >> len;
 		if (!cin)
 		{
-			cin.clear();
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			cout << "Enter the length of the pipe: ";
 		}
 		else
@@ -39,12 +43,11 @@ int get_length() {
 double get_diameter() {
 	while (true)
 	{
+		bufer();
 		double diam;
 		cin >> diam;
 		if (!cin)
 		{
-			cin.clear();
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			cout << "Enter the diameter of the pipe: ";
 		}
 		else
@@ -57,12 +60,11 @@ double get_diameter() {
 bool repair() {
 	while (true)
 	{
+		bufer();
 		bool rep;
 		cin >> rep;
 		if (!cin)
 		{
-			cin.clear();
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			cout << "Pipe under repair (0; 1): ";
 		}
 		else
@@ -75,12 +77,11 @@ bool repair() {
 int workshops() {
 	while (true)
 	{
+		bufer();
 		int wshop;
 		cin >> wshop;
 		if (!cin)
 		{
-			cin.clear();
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			cout << "Enter the number of the workshops: ";
 		}
 		else
@@ -93,12 +94,11 @@ int workshops() {
 int workshops_in_operation(int wshop) {
 	while (true)
 	{
+		bufer();
 		int wshop_in_op;
 		cin >> wshop_in_op;
 		if (!cin || wshop_in_op > wshop)
 		{
-			cin.clear();
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			cout << "Workshops in operation: ";
 		}
 		else
@@ -111,12 +111,11 @@ int workshops_in_operation(int wshop) {
 double effectiveness() {
 	while (true)
 	{
+		bufer();
 		double eff;
 		cin >> eff;
 		if (!cin)
 		{
-			cin.clear();
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			cout << "Effectiveness: ";
 		}
 		else
@@ -142,6 +141,28 @@ Station add_station() {
 	cout << "Workshops in operation: "; s.workshops_in_operation = workshops_in_operation(s.workshops);
 	cout << "Effectiveness: "; s.effectiveness = effectiveness();
 	return s;
+}
+
+void edit_pipe(Pipe& p) {
+	if (p.name.empty())
+	{
+		cout << "Please add a pipe." << endl;
+	}
+	else
+	{
+		cout << "Pipe under repair (0; 1): "; p.repair = repair();
+	}
+}
+
+void edit_station(Station& s) {
+	if (s.name.empty())
+	{
+		cout << "Please add a compressor station." << endl;
+	}
+	else
+	{
+		cout << "Workshops in operation: "; s.workshops_in_operation = workshops_in_operation(s.workshops);
+	}
 }
 
 void data(Pipe p, Station s) {
@@ -188,8 +209,6 @@ void menu() {
 		cin >> num;
 		if (!cin)
 		{
-			cin.clear();
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			cout << "Error! Enter an integer from 0 to 7." << endl;
 		}
 		else
@@ -206,10 +225,10 @@ void menu() {
 				data(pipe, station);
 				break;
 			case 4:
-				cout << "4";
+				edit_pipe(pipe);
 				break;
 			case 5:
-				cout << "5";
+				edit_station(station);
 				break;
 			case 6:
 				cout << "6";
@@ -224,6 +243,7 @@ void menu() {
 				cout << "Error! Enter an integer from 0 to 7." << endl;
 			}
 		}
+		bufer();
 	}
 }
 
