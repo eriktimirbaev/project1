@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -190,6 +191,30 @@ void data(Pipe p, Station s) {
 	}
 }
 
+void to_file(Pipe p, Station s) {
+	if (p.name.empty() || s.name.empty())
+	{
+		cout << "Please add a pipe and a station." << endl;
+	}
+	else
+	{
+		ofstream file;
+		file.open("data.txt");
+		if (file.is_open())
+		{
+			file << "Pipe name: " << p.name
+				<< "\nPipe length: " << p.length
+				<< "\nPipe diameter: " << p.diameter
+				<< "\nRepair: " << p.repair
+				<< "\nStation name: " << s.name
+				<< "\nWorkshops: " << s.workshops
+				<< "\nWorkshops in operation: " << s.workshops_in_operation
+				<< "\nEffectiveness: " << s.effectiveness << endl;
+		}
+		file.close();
+	}
+}
+
 void menu() {
 	Pipe pipe;
 	Station station;
@@ -231,7 +256,7 @@ void menu() {
 				edit_station(station);
 				break;
 			case 6:
-				cout << "6";
+				to_file(pipe, station);
 				break;
 			case 7:
 				cout << "7";
