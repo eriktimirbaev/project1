@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #include <fstream>
 
 using namespace std;
@@ -7,7 +8,7 @@ struct Pipe
 {
 	string name;
 	int length;
-	double diameter;
+	int diameter;
 	bool repair;
 };
 
@@ -41,11 +42,11 @@ int get_length() {
 	}
 }
 
-double get_diameter() {
+int get_diameter() {
 	while (true)
 	{
 		bufer();
-		double diam;
+		int diam;
 		cin >> diam;
 		if (!cin)
 		{
@@ -126,6 +127,18 @@ double effectiveness() {
 	}
 }
 
+string split(string str)
+{
+	for (int i = 0; i < str.length() ; i++)
+	{
+		if (str[i] == ':')
+		{
+			str.erase(0, i + 2);
+			return str;
+		}
+	}
+}
+
 Pipe add_pipe() {
 	Pipe p;
 	cout << "Enter the name of the pipe: "; cin >> p.name;
@@ -199,7 +212,7 @@ void to_file(Pipe p, Station s) {
 	else
 	{
 		ofstream file;
-		file.open("data.txt");
+		file.open("data.txt", ios::out);
 		if (file.is_open())
 		{
 			file << "Pipe name: " << p.name
@@ -210,8 +223,59 @@ void to_file(Pipe p, Station s) {
 				<< "\nWorkshops: " << s.workshops
 				<< "\nWorkshops in operation: " << s.workshops_in_operation
 				<< "\nEffectiveness: " << s.effectiveness << endl;
+			file.close();
+			cout << "Saving completed!" << endl;
+		}
+	}
+}
+
+void from_file(Pipe& p, Station& s) {
+	ifstream file;
+	string line;
+	file.open("data.txt", ios::in);
+	if (file.is_open())
+	{
+		while (getline(file, line))
+		{
+			if (line.find("Pipe name: ") != string::npos)
+			{
+				p.name = split(line);
+			}
+			else if (line.find("Pipe length: ") != string::npos)
+			{
+				p.length = stod(split(line));
+			}
+			else if (line.find("Pipe diameter: ") != string::npos)
+			{
+				p.diameter = stod(split(line));
+			}
+			else if (line.find("Repair: ") != string::npos)
+			{
+				p.repair = stoi(split(line));
+			}
+			else if (line.find("Station name: ") != string::npos)
+			{
+				s.name = split(line);
+			}
+			else if (line.find("Workshops: ") != string::npos)
+			{
+				s.workshops = stoi(split(line));
+			}
+			else if (line.find("Workshops in operation: ") != string::npos)
+			{
+				s.workshops_in_operation = stoi(split(line));
+			}
+			else if (line.find("Effectiveness: ") != string::npos)
+			{
+				s.effectiveness = stod(split(line));
+			}
 		}
 		file.close();
+		cout << "Loading completed!" << endl;
+	}
+	else
+	{
+		cout << "Error! File not found!" << endl;
 	}
 }
 
@@ -259,10 +323,10 @@ void menu() {
 				to_file(pipe, station);
 				break;
 			case 7:
-				cout << "7";
+				from_file(pipe, station);
 				break;
 			case 0:
-				cout << "0";
+				exit(0);
 				break;
 			default:
 				cout << "Error! Enter an integer from 0 to 7." << endl;
