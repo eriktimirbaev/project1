@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <vector>
 
 using namespace std;
 
@@ -17,6 +18,16 @@ struct Station {
 	int workshops_in_operation;
 	int effectiveness;
 };
+
+int get_correct_number(int min, int max) {
+	int x;
+	while ((cin >> x).fail() || x < min || x > max) {
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		cout << "Please enter an integer from " << min << " to " << max << ": ";
+	}
+	return x;
+}
 
 bool int_check(string input) {
 	for (int i = 0; i < input.length(); i++) {
@@ -267,57 +278,71 @@ void from_file(Pipe& p, Station& s) {
 	else cout << "Error! File not found!" << endl;
 }
 
+void print_menu() {
+	cout << "MENU" << endl
+		<< "1. Add a pipe" << endl
+		<< "2. Add a compressor station" << endl
+		<< "3. Viewing all objects" << endl
+		<< "4. Edit a pipe" << endl
+		<< "5. Edit a compressor station" << endl
+		<< "6. Save all" << endl
+		<< "7. Download" << endl
+		<< "0. Exit" << endl
+		<< "Please enter an integer from 0 to 7: ";
+}
+
+
+template <typename S>
+S& select(vector <S> g) {
+	unsigned int index = get_correct_number(0u, g.size() - 1);
+	return g[index];
+}
+
 void menu() {
-	Pipe pipe;
-	Station station;
-	string input;
-	int num;
+	vector <Pipe> pipes_group;
+	vector <Station> stations_group;
 	while (true) {
-		cout << "MENU" << endl
-			<< "1. Add a pipe" << endl
-			<< "2. Add a compressor station" << endl
-			<< "3. Viewing all objects" << endl
-			<< "4. Edit a pipe" << endl
-			<< "5. Edit a compressor station" << endl
-			<< "6. Save all" << endl
-			<< "7. Download" << endl
-			<< "0. Exit" << endl
-			<< "Please enter an integer from 0 to 7: ";
-		getline(cin, input);
-		if (int_check(input) == true) {
-			num = stoi(input);
-			switch (num)
-			{
-			case 1:
-				pipe = add_pipe(pipe);
-				break;
-			case 2:
-				station = add_station(station);
-				break;
-			case 3:
-				data(pipe, station);
-				break;
-			case 4:
-				edit_pipe(pipe);
-				break;
-			case 5:
-				edit_station(station);
-				break;
-			case 6:
-				to_file(pipe, station);
-				break;
-			case 7:
-				from_file(pipe, station);
-				break;
-			case 0:
-				exit(0);
-				break;
-			default:
-				cout << "Error! Enter an integer from 0 to 7." << endl;
-			}
+		print_menu();
+		switch (get_correct_number(0, 7))
+		{
+		case 1:
+		{
+			Pipe pipe;
+			pipe = add_pipe(pipe);
+			pipes_group.push_back(pipe);
+			break;
 		}
-		else cout << "Error! Enter an integer from 0 to 7." << endl;
-	}
+		case 2:
+		{
+			Station station;
+			station = add_station(station);
+			stations_group.push_back(station);
+			break;
+		}
+		case 3:
+			data(select(pipes_group), select(stations_group));
+			break;
+		case 4:
+			edit_pipe(select(pipes_group));
+			break;
+		case 5:
+			edit_station(select(stations_group));
+			break;
+		case 6:
+			//to_file(pipe, station);
+			cout << "6";
+			break;
+		case 7:
+			//from_file(pipe, station);
+			cout << "7";
+			break;
+		case 0:
+			exit(0);
+			break;
+		default:
+			cout << "Error! Enter an integer from 0 to 7." << endl;
+		}
+		}
 }
 
 int main() {
