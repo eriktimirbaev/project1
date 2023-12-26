@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <vector>
 
 class Pipe
 {
@@ -19,11 +20,13 @@ public:
 
 	std::string GetName() { return name; };
 	std::string GetId() { return id; };
-	int GetLength() { return length; };
+	int GetLength() const { return length; };
 	int GetDiameter() { return diameter; };
 	bool GetRepair() { return repair; };
+	double GetCapacity() const;
 
 	Pipe add_pipe(Pipe& p);
+	Pipe add_pipe_with_diameter(Pipe& p, int diameter);
 	void edit_pipe(Pipe& p, bool status);
 	void pipe_data(const Pipe& p);
 

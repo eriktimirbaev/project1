@@ -3,6 +3,21 @@
 
 using namespace std;
 
+template <typename C> 
+string GTS::SearchId(unordered_map<string, C>& group) {
+	while (true) {
+		string id;
+		getline(cin, id);
+		if (auto i = group.find(id); i != group.end()) { return id; }
+		else { std::cout << "ID not found! Please try again: "; }
+	}
+}
+
+string GTS::SelectId(unordered_set<string>& group, string id) {
+	if (auto i = group.find(id); i != group.end()) { return id; }
+	else { std::cout << "ID not found! Please try again: "; }
+}
+
 void GTS::Data(unordered_map<string, Pipe>& pipes_group, unordered_map<string, Station>& stations_group) {
 	cout << "Pipes group (0) or stations group (1): ";
 	switch (get_correct_number(0, 1))
@@ -139,6 +154,11 @@ bool CheckByPercent(Station& s, int param)
 	return ((double)(s.GetWorkshops() - s.GetWorkshopsOperation()) / (double)s.GetWorkshops() * 100) <= param;
 }
 
+bool CheckByDiameter(Pipe& p, int param)
+{
+	return p.GetDiameter() == param;
+}
+
 template <typename T, typename C>
 unordered_set<string> FindByFilter(unordered_map<string, C>& group, Filter<T, C> f, T param)
 {
@@ -250,4 +270,84 @@ void GTS::Download(unordered_map<string, Pipe>& pipes_group, unordered_map<strin
 	}
 	cout << "Successful download!" << endl;
 	file.close();
+}
+
+void GTS::ViewConnections() {
+	connections.ViewConnections();
+}
+
+unordered_set<string> GTS::GetFreePipes(const unordered_set<string>& IDs) {
+	unordered_set<string> free_IDs;
+	for (auto& id : IDs) {
+		if (!connections.edges.contains(id)) {
+			free_IDs.insert(id);
+		}
+	}
+	return free_IDs;
+}
+
+void GTS::CreateConnection(unordered_map<string, Pipe>& pipes_group, unordered_map<string, Station>& stations_group) {
+	if (stations_group.size() < 2) { cout << "There are not enough stations to create a connection!" << endl; return; }
+	for (auto& station : stations_group) station.second.station_data(station.second);
+	string start_station, terminal_station, pipe_id;
+	cout << "Enter the ID of the starting station: ";
+	start_station = SearchId(stations_group);
+	cout << "Enter the ID of the terminal station: ";
+	terminal_station = SearchId(stations_group);
+
+	if (connections.UncorrectNodes(start_station, terminal_station)) { return; }
+	cout << "Diameters of the pipes:" << endl << "1. 500" << endl << "2. 700" << endl << "3. 1000" << endl << "4. 1400" << endl
+		<< "Enter the diameter of the pipe (millimeters): ";
+	int diameter = get_correct_number(0, 1400);
+	unordered_set<string> select_pipes = FindByFilter(pipes_group, CheckByDiameter, diameter);
+	for (string i : select_pipes)
+		pipes_group[i].pipe_data(pipes_group[i]);
+	cout << "Enter the ID of the pipe: ";
+	pipe_id = SelectId(select_pipes, SearchId(pipes_group));
+	select_pipes = GetFreePipes({ pipe_id });
+
+	if (select_pipes.size() == 0) {
+		cout << "The pipes have not been found or they are already in connection.\nDo you want to create such a pipe?\nNo(0), Yes(1): ";
+		if (!get_correct_number(0, 1)) { return; }
+		else {
+			Pipe pipe;
+			pipe.add_pipe_with_diameter(pipe, diameter);
+			pipe_id = pipe.GetId();
+			pipes_group.insert({ pipe_id, pipe });
+			connections.CreateConnection(start_station, terminal_station, pipe_id);
+			return;
+		}
+	}
+	else {
+		connections.CreateConnection(start_station, terminal_station, pipe_id);
+		return;
+	}
+}
+
+void GTS::DeleteConnection(unordered_map<string, Pipe>& pipes_group) {
+	if (connections.Empty()) {
+		cout << "No connections available!" << endl;
+		return;
+	}
+
+	connections.ViewConnections();
+	cout << "Enter the ID of the connection to be deleted: ";
+	string id;
+	do {
+		id = SearchId(pipes_group);
+		if (!connections.edges.contains(id)) { cout << "There is no such ID among the pipes found! Enter it again." << endl; }
+	} while (!connections.edges.contains(id));
+	connections.DeleteConnection_ByPipeID(id);
+}
+
+void GTS::TopologicalSort(unordered_map<string, Pipe>& pipes_group) {
+	if (connections.Empty()) { cout << "No connections available!"; return; }
+	Graph graph = Graph(connections.edges, connections.nodes, pipes_group);
+	vector<string> result = graph.TopologicalSort();
+	if (!result.size()) { cout << "Topological sort: - "; return; }
+	cout << "Topological sorting: ";
+	for (auto& i : result) {
+		cout << i << " ";
+	}
+	cout << endl;
 }

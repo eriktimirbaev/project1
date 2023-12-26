@@ -14,8 +14,9 @@ void print_menu() {
 		<< "5. Save all" << endl
 		<< "6. Download" << endl
 		<< "7. Delete" << endl
+		<< "8. Graph" << endl
 		<< "0. Exit" << endl
-		<< "Please enter an integer from 0 to 7: ";
+		<< "Please enter an integer from 0 to 8: ";
 }
 
 void menu() {
@@ -25,7 +26,7 @@ void menu() {
 
 	while (true) {
 		print_menu();
-		switch (get_correct_number(0, 7))
+		switch (get_correct_number(0, 8))
 		{
 		case 1:
 		{
@@ -46,8 +47,26 @@ void menu() {
 		case 5: { system.Save(pipes_group, stations_group); break; }
 		case 6: { system.Download(pipes_group, stations_group); break; }
 		case 7: { system.Delete(pipes_group, stations_group); break; }
+		case 8:
+		{
+			cout << "1. Create connection" << endl
+				<< "2. Delete connection" << endl
+				<< "3. View connections" << endl
+				<< "4. Topological sort" << endl
+				<< "0. Back" << endl
+				<< "Please enter an integer from 0 to 4: ";;
+
+			switch (get_correct_number(0, 4)) {
+			case 1: { system.CreateConnection(pipes_group, stations_group); break; }
+			case 2: { system.DeleteConnection(pipes_group); break; }
+			case 3: { system.ViewConnections(); break; }
+			case 4: { system.TopologicalSort(pipes_group); break; }
+			case 0: { break; }
+			}
+			break;
+		}
 		case 0: { exit(0); break; }
-		default: { cout << "Error! Enter an integer from 0 to 9." << endl; }
+		default: { cout << "Error! Enter an integer from 0 to 8." << endl; }
 		}
 	}
 }

@@ -34,6 +34,21 @@ Pipe Pipe::add_pipe(Pipe& p) {
 	return p;
 }
 
+Pipe Pipe::add_pipe_with_diameter(Pipe& p, int diameter)
+{
+	while (true) {
+		cout << "Enter the name of the pipe: "; getline(cin, p.name);
+		if (p.name.empty()) cout << "Error!" << endl;
+		else LOG(p.name) break;
+	}
+	cout << "Enter the length of the pipe (meters): ";
+	p.length = get_correct_number(0, 1000);
+	p.diameter = diameter;
+	cout << "Pipe under repair (0; 1): ";
+	p.repair = get_correct_number(0, 1);
+	return p;
+}
+
 void Pipe::edit_pipe(Pipe& p, bool status) {
 	p.repair = status;
 }
@@ -45,6 +60,11 @@ void Pipe::pipe_data(const Pipe& p) {
 		<< "\nPipe diameter: " << p.diameter
 		<< "\nRepair: " << p.repair << endl;
 
+}
+
+double Pipe::GetCapacity() const {
+	double capacity = sqrt(pow(diameter, 5) / length);
+	return repair ? capacity : -DBL_MAX;
 }
 
 ofstream& operator << (ofstream& fout, const Pipe& p) {
