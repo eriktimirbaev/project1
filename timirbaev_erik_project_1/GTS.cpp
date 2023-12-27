@@ -225,9 +225,10 @@ void GTS::Save(unordered_map<string, Pipe>& pipes_group, unordered_map<string, S
 
 		ofstream file;
 		file.open(name, ios::out);
-		file << pipes_group.size() << " " << stations_group.size() << endl;
+		file << pipes_group.size() << " " << stations_group.size() << " " << connections.edges.size() << endl;
 		for (auto& pipe : pipes_group) { file << pipe.second; }
 		for (auto& station : stations_group) { file << station.second; };
+		file << connections;
 		file.close();
 		cout << "Successful save!" << endl;
 	}
@@ -251,12 +252,14 @@ void GTS::Download(unordered_map<string, Pipe>& pipes_group, unordered_map<strin
 
 	pipes_group.clear();
 	stations_group.clear();
+	connections.edges.clear();
 	Pipe pipe;
 	Station station;
-	int count_pipes, count_stations;
+	Edge edge;
+	int count_pipes, count_stations, count_connectios;
 
 	file.open(names[download - 1]);
-	file >> count_pipes >> count_stations;
+	file >> count_pipes >> count_stations >> count_connectios;
 
 	while (count_pipes--)
 	{
@@ -267,6 +270,11 @@ void GTS::Download(unordered_map<string, Pipe>& pipes_group, unordered_map<strin
 	{
 		file >> station;
 		stations_group.insert({ station.GetId(), station });
+	}
+	while (count_connectios--)
+	{
+		file >> edge;
+		connections.Insert(edge);
 	}
 	cout << "Successful download!" << endl;
 	file.close();
@@ -302,11 +310,13 @@ void GTS::CreateConnection(unordered_map<string, Pipe>& pipes_group, unordered_m
 	unordered_set<string> select_pipes = FindByFilter(pipes_group, CheckByDiameter, diameter);
 	for (string i : select_pipes)
 		pipes_group[i].pipe_data(pipes_group[i]);
-	cout << "Enter the ID of the pipe: ";
-	pipe_id = SelectId(select_pipes, SearchId(pipes_group));
-	select_pipes = GetFreePipes({ pipe_id });
+	if (select_pipes.size()) {
+		cout << "Enter the ID of the pipe: ";
+		pipe_id = SelectId(select_pipes, SearchId(pipes_group));
+		select_pipes = GetFreePipes({ pipe_id });
+	}
 
-	if (select_pipes.size() == 0) {
+	if (!select_pipes.size()) {
 		cout << "The pipes have not been found or they are already in connection.\nDo you want to create such a pipe?\nNo(0), Yes(1): ";
 		if (!get_correct_number(0, 1)) { return; }
 		else {
@@ -324,30 +334,86 @@ void GTS::CreateConnection(unordered_map<string, Pipe>& pipes_group, unordered_m
 	}
 }
 
-void GTS::DeleteConnection(unordered_map<string, Pipe>& pipes_group) {
+void GTS::DeleteConnection(unordered_map<string, Pipe>& pipes_group, unordered_map<string, Station>& stations_group) {
 	if (connections.Empty()) {
 		cout << "No connections available!" << endl;
 		return;
 	}
 
 	connections.ViewConnections();
-	cout << "Enter the ID of the connection to be deleted: ";
-	string id;
-	do {
-		id = SearchId(pipes_group);
-		if (!connections.edges.contains(id)) { cout << "There is no such ID among the pipes found! Enter it again." << endl; }
-	} while (!connections.edges.contains(id));
-	connections.DeleteConnection_ByPipeID(id);
+	cout << "Delete connection by pipe ID (0) or by station ID (1): ";
+	switch (get_correct_number(0, 1))
+	{
+	case 0: 
+	{
+		cout << "Enter the pipe ID to remove the connection: ";
+		string id;
+		do {
+			id = SearchId(pipes_group);
+			if (!connections.edges.contains(id)) { cout << "There is no such ID among the pipes found! Enter it again." << endl; }
+		} while (!connections.edges.contains(id));
+		connections.DeleteConnection_ByPipeID(id);
+		break;
+	}
+	case 1:
+	{
+		cout << "Enter the station ID to remove the connection: ";
+		string id;
+		do {
+			id = SearchId(stations_group);
+			if (!connections.nodes.contains(id)) { cout << "There is no such ID among the stations found! Enter it again." << endl; }
+		} while (!connections.nodes.contains(id));
+		connections.DeleteConnection_ByStationID(id);
+		break;
+	}
+	default: { return; }
+	}
 }
 
 void GTS::TopologicalSort(unordered_map<string, Pipe>& pipes_group) {
 	if (connections.Empty()) { cout << "No connections available!"; return; }
 	Graph graph = Graph(connections.edges, connections.nodes, pipes_group);
 	vector<string> result = graph.TopologicalSort();
-	if (!result.size()) { cout << "Topological sort: - "; return; }
+	if (!result.size()) { cout << "Topological sort: - " << endl; return; }
 	cout << "Topological sorting: ";
 	for (auto& i : result) {
 		cout << i << " ";
 	}
 	cout << endl;
+}
+
+void GTS::ShortestPath(unordered_map<string, Pipe>& pipes_group, unordered_map<string, Station>& stations_group) {
+	if (connections.Empty()) { cout << "No connections available!"; return; }
+	Graph graph = Graph(connections.edges, connections.nodes, pipes_group);
+
+	connections.ViewConnections();
+	cout << "Enter the starting vertex of the path: ";
+	string StartNode = SearchId(stations_group);
+
+	cout << "Enter the final vertex of the path: ";
+	string EndNode = SearchId(stations_group);
+
+	vector<string> result = graph.Metod_Deikstra(string_to_int(StartNode), string_to_int(EndNode));
+	if (!result.size()) { cout << "Path: - "; return; }
+	cout << "Path: ";
+	for (auto& i : result) {
+		cout << i << " -> ";
+	}
+	cout << "End" << endl;
+	cout << "Path length: " << graph.Lenght_ShortestPath(result) << endl;
+}
+
+void GTS::MaxFlow(unordered_map<string, Pipe>& pipes_group, unordered_map<string, Station>& stations_group) {
+	if (connections.Empty()) { cout << "No connections available!"; return; }
+	Graph graph = Graph(connections.edges, connections.nodes, pipes_group);
+
+	connections.ViewConnections();
+	cout << "Enter the starting vertex of the path: ";
+	string StartNode = SearchId(stations_group);
+
+	cout << "Enter the final vertex of the path: ";
+	string EndNode = SearchId(stations_group);
+
+	double result = graph.Ford_Fulkerson(string_to_int(StartNode), string_to_int(EndNode));
+	cout << "Maximum flow: " << result << endl;
 }

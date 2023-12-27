@@ -74,3 +74,10 @@ void Connections::ResetNodes()
         nodes.insert(edge.second.terminal);
     }
 }
+
+ofstream& operator << (ofstream& file, const Connections& connections) {
+    if (file.is_open()) {
+        for (auto& edge : connections.edges) { file << edge.second; }
+    }
+    return file;
+}

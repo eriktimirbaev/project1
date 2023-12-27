@@ -14,6 +14,8 @@ class Edge
 	friend Graph;
 	friend GTS;
 	friend Connections;
+	friend std::ofstream& operator << (std::ofstream& file, const Edge& edge);
+	friend std::ifstream& operator >> (std::ifstream& file, Edge& edge);
 
 public:
 	Edge() {};
@@ -29,6 +31,11 @@ class Graph
 public:
 	Graph(const std::unordered_map<std::string, Edge>& edges, const std::set<std::string>& nodes, const std::unordered_map<std::string, Pipe>& pipes);
 	std::vector<std::string> TopologicalSort();
+	std::vector<std::string> Metod_Deikstra(int StartNode, int EndNode) const;
+	double Ford_Fulkerson(int StartNode, int  EndNode) const;
+	double Lenght_ShortestPath(std::vector<std::string>&);
+	bool BFS_MaxFlow(std::vector<std::vector<double>>& capacity,
+	int StartNode, int EndNode, std::vector<int>& parent) const;
 
 private:
 	bool DFS_Cycle(int, std::vector<bool>&, std::vector<bool>&);

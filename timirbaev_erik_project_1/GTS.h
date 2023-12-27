@@ -29,9 +29,13 @@ public:
 
 	void CreateConnection(std::unordered_map<std::string, Pipe>& pipes_group, std::unordered_map<std::string, Station>& stations_group);
 
-	void DeleteConnection(std::unordered_map<std::string, Pipe>& pipes_group);
+	void DeleteConnection(std::unordered_map<std::string, Pipe>& pipes_group, std::unordered_map<std::string, Station>& stations_group);
 
 	void TopologicalSort(std::unordered_map<std::string, Pipe>& pipes_group);
+
+	void ShortestPath(std::unordered_map<std::string, Pipe>& pipes_group, std::unordered_map<std::string, Station>& stations_group);
+
+	void MaxFlow(std::unordered_map<std::string, Pipe>& pipes_group, std::unordered_map<std::string, Station>& stations_group);
 
 	Connections connections;
 

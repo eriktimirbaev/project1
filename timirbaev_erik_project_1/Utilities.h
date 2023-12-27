@@ -41,3 +41,7 @@ inline int get_correct_number(int min, int max) {
 	LOG(num);
 	return stoi(num);
 }
+
+inline int string_to_int(std::string x) { return stoi(x.substr(7, x.size() - 7)); }
+
+inline std::string int_to_string(int x) { return "Station" + std::to_string(x); }

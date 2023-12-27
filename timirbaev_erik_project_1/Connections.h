@@ -1,6 +1,7 @@
 #pragma once
 #include "Graph.h"
 #include "Utilities.h"
+#include <fstream>
 
 class Connections {
 public:
@@ -16,7 +17,7 @@ public:
     void DeleteConnection_ByPipeID(std::string id);
     void DeleteConnection_ByStationID(std::string id);
 
-    //friend std::ofstream& operator << (std::ofstream& file, const Connections& connections);
+    friend std::ofstream& operator << (std::ofstream& file, const Connections& connections);
 private:
     void ResetNodes();
 };

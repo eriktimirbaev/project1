@@ -28,7 +28,7 @@ Pipe Pipe::add_pipe(Pipe& p) {
 	cout << "Enter the length of the pipe (meters): ";
 	p.length = get_correct_number(0, 1000);
 	cout << "Enter the diameter of the pipe (millimeters): ";
-	p.diameter = get_correct_number(0, 1000);
+	p.diameter = get_correct_number(0, 1400);
 	cout << "Pipe under repair (0; 1): ";
 	p.repair = get_correct_number(0, 1);
 	return p;
@@ -63,8 +63,8 @@ void Pipe::pipe_data(const Pipe& p) {
 }
 
 double Pipe::GetCapacity() const {
-	double capacity = sqrt(pow(diameter, 5) / length);
-	return repair ? capacity : -DBL_MAX;
+	double capacity = sqrt(pow(diameter / 1000.0, 5) / length);
+	return !repair ? capacity : -DBL_MAX;
 }
 
 ofstream& operator << (ofstream& fout, const Pipe& p) {

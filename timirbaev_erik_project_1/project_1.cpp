@@ -53,14 +53,18 @@ void menu() {
 				<< "2. Delete connection" << endl
 				<< "3. View connections" << endl
 				<< "4. Topological sort" << endl
+				<< "5. Shortest path" << endl
+				<< "6. Algorithm Ford-Falkerson" << endl
 				<< "0. Back" << endl
-				<< "Please enter an integer from 0 to 4: ";;
+				<< "Please enter an integer from 0 to 6: ";;
 
-			switch (get_correct_number(0, 4)) {
+			switch (get_correct_number(0, 6)) {
 			case 1: { system.CreateConnection(pipes_group, stations_group); break; }
-			case 2: { system.DeleteConnection(pipes_group); break; }
+			case 2: { system.DeleteConnection(pipes_group, stations_group); break; }
 			case 3: { system.ViewConnections(); break; }
 			case 4: { system.TopologicalSort(pipes_group); break; }
+			case 5: { system.ShortestPath(pipes_group, stations_group); break; }
+			case 6: { system.MaxFlow(pipes_group, stations_group); break; }
 			case 0: { break; }
 			}
 			break;
